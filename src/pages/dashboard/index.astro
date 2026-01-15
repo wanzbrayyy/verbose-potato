@@ -1,3 +1,4 @@
+
 ---
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import StatCard from '../../components/dashboard/StatCard.astro';
@@ -36,7 +37,7 @@ import ExpenseModal from '../../components/dashboard/ExpenseModal.jsx';
   import { dashboardData } from '../../stores/user.js';
   
   function formatCurrency(value) {
-    return `Rp ${(value || 0).toLocaleString('id-ID')}`;
+    return \`Rp \${(value || 0).toLocaleString('id-ID')}\`;
   }
 
   function updateUI(data) {
@@ -77,7 +78,11 @@ import ExpenseModal from '../../components/dashboard/ExpenseModal.jsx';
 <style>
   [data-expense-modal-container] { display: none; }
 </style>
-EOFExpenseModal.jsxbash
+EOF```
+
+### 5. Update `ExpenseModal.jsx` (Agar Bisa Komunikasi dengan Astro)
+
+```bash
 cat > src/components/dashboard/ExpenseModal.jsx <<EOF
 import { useState } from 'react';
 import { api } from '../../services/api';
