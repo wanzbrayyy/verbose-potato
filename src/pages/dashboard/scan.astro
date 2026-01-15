@@ -1,0 +1,9 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import CameraView from '../../components/dashboard/CameraView.jsx';
+---
+<DashboardLayout title="Scan Catatan">
+  <div class="bg-white rounded-3xl p-4 shadow-sm">
+    <CameraView client:only="react" />
+  </div>
+</DashboardLayout>

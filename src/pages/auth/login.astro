@@ -1,0 +1,44 @@
+---
+import AuthLayout from '../../layouts/AuthLayout.astro';
+import Input from '../../components/ui/Input.astro';
+import Button from '../../components/ui/Button.astro';
+---
+<AuthLayout title="Login - Warkop Arum">
+  <form id="login-form">
+    <Input label="Email" name="email" type="email" required />
+    <Input label="Password" name="password" type="password" required />
+    <Button type="submit" class="mt-4">MASUK DASHBOARD</Button>
+  </form>
+  <p class="text-center mt-6 text-slate-500">
+    Belum punya akun? <a href="/auth/register" class="text-slate-900 font-bold hover:underline">Daftar</a>
+  </p>
+</AuthLayout>
+
+<script>
+  import { api } from '../../services/api';
+  import { setUser } from '../../stores/user';
+
+  const form = document.getElementById('login-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const btn = form.querySelector('button');
+    const originalText = btn.textContent;
+    
+    try {
+      btn.textContent = 'Loading...';
+      const res = await api.login(formData.get('email'), formData.get('password'));
+      
+      if (res.success) {
+        setUser(res.user);
+        window.location.href = '/dashboard';
+      } else {
+        alert(res.error || 'Login Gagal');
+      }
+    } catch (err) {
+      alert('Error koneksi');
+    } finally {
+      btn.textContent = originalText;
+    }
+  });
+</script>

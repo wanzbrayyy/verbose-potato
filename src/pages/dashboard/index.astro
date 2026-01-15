@@ -1,0 +1,21 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import StatCard from '../../components/dashboard/StatCard.astro';
+import Button from '../../components/ui/Button.astro';
+---
+<DashboardLayout title="Dashboard Overview">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <StatCard title="Omzet Hari Ini" value="Rp 0" />
+    <StatCard title="Transaksi" value="0" />
+    <StatCard title="Status" value="Aktif" color="bg-emerald-50 text-emerald-700" />
+  </div>
+
+  <div class="bg-white rounded-2xl p-8 text-center border border-slate-100 py-16">
+    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">📸</div>
+    <h3 class="text-xl font-bold text-slate-900 mb-2">Mulai Transaksi Baru</h3>
+    <p class="text-slate-500 mb-6 max-w-sm mx-auto">Scan catatan manual untuk mengubahnya menjadi laporan digital otomatis.</p>
+    <a href="/dashboard/scan" class="inline-block">
+      <Button class="w-auto px-8">Buka Kamera</Button>
+    </a>
+  </div>
+</DashboardLayout>

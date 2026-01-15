@@ -1,0 +1,11 @@
+---
+const { title, class: className } = Astro.props;
+---
+<header class:list={["bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-30", className]}>
+  <div>
+    {title && <h1 class="text-xl font-bold text-slate-800">{title}</h1>}
+  </div>
+  <div class="flex items-center gap-4">
+    <slot />
+  </div>
+</header>

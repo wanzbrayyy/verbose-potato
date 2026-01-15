@@ -1,0 +1,17 @@
+---
+const { title = "Warkop Arum" } = Astro.props;
+---
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <slot />
+    <script>
+      import { initUser } from '../stores/user';
+      initUser();
+    </script>
+  </body>
+</html>

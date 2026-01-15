@@ -1,0 +1,15 @@
+---
+import BaseLayout from './BaseLayout.astro';
+const { title } = Astro.props;
+---
+<BaseLayout title={title}>
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-800">Warkop Arum</h1>
+        <p class="text-slate-500 mt-2">Sistem Kasir Cerdas</p>
+      </div>
+      <slot />
+    </div>
+  </div>
+</BaseLayout>
