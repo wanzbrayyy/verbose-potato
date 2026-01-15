@@ -10,17 +10,29 @@ export function setUser(userData) {
   }
 }
 
+export function setScanResult(data) {
+  scanResult.set(data);
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('scanResult', JSON.stringify(data));
+  }
+}
+
 export function logout() {
   userStore.set(null);
+  scanResult.set(null);
   if (typeof window !== 'undefined') {
     localStorage.removeItem('user');
+    sessionStorage.removeItem('scanResult');
     window.location.href = '/auth/login';
   }
 }
 
-export function initUser() {
+export function initStores() {
   if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('user');
-    if (stored) userStore.set(JSON.parse(stored));
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) userStore.set(JSON.parse(storedUser));
+
+    const storedScan = sessionStorage.getItem('scanResult');
+    if (storedScan) scanResult.set(JSON.parse(storedScan));
   }
 }

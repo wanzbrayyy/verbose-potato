@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../../services/api';
-import { scanResult } from '../../stores/user';
+import { setScanResult } from '../../stores/user';
 
 export default function CameraView() {
   const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [stream, setStream] = useState(null);
 
@@ -20,13 +21,22 @@ export default function CameraView() {
       setStream(mediaStream);
       if (videoRef.current) videoRef.current.srcObject = mediaStream;
     } catch (err) {
-      console.error("Camera Error:", err);
-      alert("Gagal akses kamera");
+      console.warn("Camera acces denied or unavailable", err);
     }
   };
 
   const stopCamera = () => {
     if (stream) stream.getTracks().forEach(track => track.stop());
+  };
+
+  const processResponse = (result) => {
+    if (result.success) {
+      setScanResult(result);
+      window.location.href = '/dashboard/result';
+    } else {
+      alert('Gagal memproses gambar: ' + (result.error || 'Unknown error'));
+      setLoading(false);
+    }
   };
 
   const captureAndUpload = async () => {
@@ -41,18 +51,29 @@ export default function CameraView() {
     canvas.toBlob(async (blob) => {
       try {
         const result = await api.scan(blob);
-        if (result.success) {
-          scanResult.set(result);
-          window.location.href = '/dashboard/result';
-        } else {
-          alert('Gagal memproses gambar');
-        }
+        processResponse(result);
       } catch (e) {
         alert('Error koneksi server');
-      } finally {
         setLoading(false);
       }
     }, 'image/jpeg', 0.8);
+  };
+
+  const handleGalleryUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+    const reader = new FileReader();
+    
+    // Preview sementara (optional logic)
+    
+    api.scan(file)
+      .then(processResponse)
+      .catch(err => {
+        alert('Error upload gallery');
+        setLoading(false);
+      });
   };
 
   return (
@@ -62,23 +83,49 @@ export default function CameraView() {
           ref={videoRef} 
           autoPlay 
           playsInline 
+          muted
           className="w-full h-full object-cover"
         />
         {loading && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+          <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-50 text-white">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent mb-4"></div>
+            <p className="font-bold animate-pulse">Sedang Menganalisa...</p>
           </div>
         )}
       </div>
 
-      <button
-        onClick={captureAndUpload}
-        disabled={loading}
-        className="w-20 h-20 bg-white border-4 border-slate-200 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-xl"
-      >
-        <div className="w-16 h-16 bg-slate-900 rounded-full"></div>
-      </button>
-      <p className="mt-4 text-slate-500 font-medium">Tap tombol untuk scan catatan</p>
+      <div className="flex gap-6 items-center">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={loading}
+          className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-2xl hover:bg-slate-200 transition-colors"
+          title="Upload Galeri"
+        >
+          🖼️
+        </button>
+
+        <button
+          onClick={captureAndUpload}
+          disabled={loading}
+          className="w-24 h-24 bg-white border-4 border-slate-200 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-xl"
+        >
+          <div className="w-20 h-20 bg-slate-900 rounded-full"></div>
+        </button>
+
+        <div className="w-16 h-16"></div> 
+      </div>
+
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        accept="image/*"
+        className="hidden"
+        onChange={handleGalleryUpload}
+      />
+      
+      <p className="mt-6 text-slate-500 font-medium text-center">
+        Tap tombol tengah untuk foto<br/>atau tombol kiri untuk galeri
+      </p>
     </div>
   );
 }
