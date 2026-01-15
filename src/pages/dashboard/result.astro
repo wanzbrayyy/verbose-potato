@@ -9,49 +9,53 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
     </div>
   </div>
 </DashboardLayout>
+
 <script>
-  import { scanResult } from '../../stores/user.js';
-  const container = document.getElementById('result-container');
-  const unsubscribe = scanResult.subscribe(data => {
-    if (!data) {
-        const cached = sessionStorage.getItem('scanResult');
-        if (!cached) window.location.href = '/dashboard/scan';
-        return;
+  document.addEventListener('astro:page-load', () => {
+    const container = document.getElementById('result-container');
+    const cachedData = sessionStorage.getItem('scanResult');
+
+    if (!cachedData) {
+      window.location.href = '/dashboard/scan';
+      return;
     }
+
+    const data = JSON.parse(cachedData);
+
     const itemsHtml = data.data.length > 0 ? data.data.map(item => {
         const paymentMethod = item.paymentMethod || 'Belum Bayar';
         const colorClass = paymentMethod === 'Cash' ? 'bg-emerald-100 text-emerald-700' : 
                           paymentMethod === 'QRIS' ? 'bg-sky-100 text-sky-700' :
                           'bg-red-100 text-red-700';
-
         return `
           <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100 mb-3">
             <div class="flex items-center gap-4">
               <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center font-bold text-slate-700 shadow-sm border border-slate-100">${item.qty}x</div>
               <div>
                 <h4 class="font-bold text-slate-900">${item.product}</h4>
-                <p class="text-sm text-slate-500">@ Rp ${(item.price / 1000).toLocaleString()}k</p>
+                <p class="text-sm text-slate-500">@ Rp ${(item.price).toLocaleString('id-ID')}</p>
               </div>
             </div>
             <div class="text-right">
-              <p class="font-bold text-slate-900">Rp ${(item.qty * item.price).toLocaleString()}</p>
+              <p class="font-bold text-slate-900">Rp ${(item.qty * item.price).toLocaleString('id-ID')}</p>
               <span class="text-xs font-bold px-2 py-1 rounded ${colorClass}">${paymentMethod.toUpperCase()}</span>
             </div>
           </div>
         `;
-    }).join('') : '<div class="text-center p-8 text-slate-400">Tidak ada item terdeteksi</div>';
+    }).join('') : '<div class="text-center p-8 text-slate-400">Tidak ada item terdeteksi oleh AI.</div>';
+
     container.innerHTML = `
       <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex justify-between items-center">
         <div>
           <p class="text-slate-400 text-sm">Total Transaksi</p>
-          <p class="text-3xl font-bold">Rp ${data.total.toLocaleString()}</p>
+          <p class="text-3xl font-bold">Rp ${data.total.toLocaleString('id-ID')}</p>
         </div>
         <div class="text-right"><span class="bg-white/10 px-3 py-1 rounded-full text-sm">${data.data.length} Item</span></div>
       </div>
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"><h3 class="font-bold text-lg mb-4 text-slate-800">Rincian Item</h3>${itemsHtml}</div>
       <div class="flex gap-4 pb-8">
-        <button onclick="window.location.href='/dashboard/scan'" class="flex-1 py-3 px-4 rounded-xl font-bold border-2 border-slate-200 text-slate-600">Scan Lagi</button>
-        <button onclick="window.location.href='/dashboard'" class="flex-1 py-3 px-4 rounded-xl font-bold bg-emerald-600 text-white">Selesai</button>
+        <button onclick="sessionStorage.removeItem('scanResult'); window.location.href='/dashboard/scan'" class="flex-1 py-3 px-4 rounded-xl font-bold border-2 border-slate-200 text-slate-600">Scan Lagi</button>
+        <button onclick="sessionStorage.removeItem('scanResult'); window.location.href='/dashboard'" class="flex-1 py-3 px-4 rounded-xl font-bold bg-emerald-600 text-white">Selesai</button>
       </div>
     `;
   });
