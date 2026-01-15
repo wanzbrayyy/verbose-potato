@@ -16,7 +16,12 @@ import DashboardLayout from '../../layouts/DashboardLayout.astro';
     const cachedData = sessionStorage.getItem('scanResult');
 
     if (!cachedData) {
-      window.location.href = '/dashboard/scan';
+      setTimeout(() => {
+        // Beri jeda sedikit sebelum redirect, kalau-kalau halaman lain belum sempat menulis
+        if (!sessionStorage.getItem('scanResult')) {
+            window.location.href = '/dashboard/scan';
+        }
+      }, 100);
       return;
     }
 

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../../services/api';
-import { setScanResult } from '../../stores/user';
 
 export default function CameraView() {
   const videoRef = useRef(null);
@@ -21,7 +20,7 @@ export default function CameraView() {
       setStream(mediaStream);
       if (videoRef.current) videoRef.current.srcObject = mediaStream;
     } catch (err) {
-      console.warn("Camera acces denied or unavailable", err);
+      console.warn("Camera access denied or unavailable", err);
     }
   };
 
@@ -29,9 +28,10 @@ export default function CameraView() {
     if (stream) stream.getTracks().forEach(track => track.stop());
   };
 
-  const processResponse = (result) => {
-    if (result.success) {
-      setScanResult(result);
+  const processApiResponse = (result) => {
+    if (result && result.success) {
+      // LANGSUNG SIMPAN KE SESSION STORAGE
+      sessionStorage.setItem('scanResult', JSON.stringify(result));
       window.location.href = '/dashboard/result';
     } else {
       alert('Gagal memproses gambar: ' + (result.error || 'Unknown error'));
@@ -40,7 +40,10 @@ export default function CameraView() {
   };
 
   const captureAndUpload = async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !videoRef.current.srcObject) {
+        alert("Kamera tidak aktif. Coba muat ulang halaman atau izinkan akses kamera.");
+        return;
+    }
     setLoading(true);
 
     const canvas = document.createElement('canvas');
@@ -51,7 +54,7 @@ export default function CameraView() {
     canvas.toBlob(async (blob) => {
       try {
         const result = await api.scan(blob);
-        processResponse(result);
+        processApiResponse(result);
       } catch (e) {
         alert('Error koneksi server');
         setLoading(false);
@@ -59,26 +62,22 @@ export default function CameraView() {
     }, 'image/jpeg', 0.8);
   };
 
-  const handleGalleryUpload = (e) => {
+  const handleGalleryUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setLoading(true);
-    const reader = new FileReader();
-    
-    // Preview sementara (optional logic)
-    
-    api.scan(file)
-      .then(processResponse)
-      .catch(err => {
-        alert('Error upload gallery');
+    try {
+        const result = await api.scan(file);
+        processApiResponse(result);
+    } catch (err) {
+        alert('Error saat upload dari galeri');
         setLoading(false);
-      });
+    }
   };
 
   return (
     <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
-      <div className="relative w-full aspect-[3/4] bg-black rounded-2xl overflow-hidden shadow-2xl mb-6">
+      <div className="relative w-full aspect-[3/4] bg-slate-900 rounded-2xl overflow-hidden shadow-2xl mb-6 flex items-center justify-center text-slate-500">
         <video 
           ref={videoRef} 
           autoPlay 
