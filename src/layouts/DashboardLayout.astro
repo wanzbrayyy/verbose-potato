@@ -19,11 +19,13 @@ const { title } = Astro.props;
   </div>
   <script>
     import { userStore, logout } from '../stores/user.js';
+
+    if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
+        window.location.href = '/auth/login';
+    }
     
     userStore.subscribe(u => {
-      if (!u && window.location.pathname.startsWith('/dashboard')) {
-        window.location.href = '/auth/login';
-      } else if (u) {
+      if (u) {
         const el = document.getElementById('user-name');
         if(el) el.textContent = u.nama;
       }

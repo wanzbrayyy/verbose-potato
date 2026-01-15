@@ -2,16 +2,14 @@ import { atom } from 'nanostores';
 
 export const userStore = atom(null);
 export const scanResult = atom(null);
-export const dashboardData = atom({
-  totalRevenue: 0,
-  totalExpenses: 0,
-  netIncome: 0,
-  transactionCount: 0,
-});
+export const dashboardData = atom({ totalRevenue: 0, totalExpenses: 0, netIncome: 0, transactionCount: 0 });
 
-export function setUser(userData) {
+export function setUserAndToken(userData, token) {
   userStore.set(userData);
-  if (typeof window !== 'undefined') localStorage.setItem('user', JSON.stringify(userData));
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', token);
+  }
 }
 
 export function setScanResult(data) {
@@ -24,6 +22,7 @@ export function logout() {
   scanResult.set(null);
   if (typeof window !== 'undefined') {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     sessionStorage.removeItem('scanResult');
     window.location.href = '/auth/login';
   }
@@ -33,7 +32,6 @@ export function initStores() {
   if (typeof window !== 'undefined') {
     const storedUser = localStorage.getItem('user');
     if (storedUser) userStore.set(JSON.parse(storedUser));
-
     const storedScan = sessionStorage.getItem('scanResult');
     if (storedScan) scanResult.set(JSON.parse(storedScan));
   }
