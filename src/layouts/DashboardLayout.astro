@@ -18,9 +18,9 @@ const { title } = Astro.props;
     </main>
   </div>
   <script>
-    import { , logout } from '../stores/user';
+    import { userStore, logout } from '../stores/user.js';
     
-    .subscribe(u => {
+    userStore.subscribe(u => {
       if (!u && window.location.pathname.startsWith('/dashboard')) {
         window.location.href = '/auth/login';
       } else if (u) {

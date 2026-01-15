@@ -10,7 +10,7 @@ const { title = "Warkop Arum" } = Astro.props;
   <body class="bg-slate-50 text-slate-900 font-sans antialiased">
     <slot />
     <script>
-      import { initUser } from '../stores/user';
+      import { initUser } from '../stores/user.js';
       initUser();
     </script>
   </body>

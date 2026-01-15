@@ -12,11 +12,11 @@ import Button from '../../components/ui/Button.astro';
 </DashboardLayout>
 
 <script>
-  import {  } from '../../stores/user';
+  import { scanResult } from '../../stores/user.js';
 
   const container = document.getElementById('result-container');
   
-  .subscribe(data => {
+  scanResult.subscribe(data => {
     if (!data) {
       window.location.href = '/dashboard/scan';
       return;

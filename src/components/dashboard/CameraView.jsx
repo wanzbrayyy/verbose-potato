@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '../../services/api';
-import {  } from '../../stores/user';
+import { scanResult } from '../../stores/user';
 
 export default function CameraView() {
   const videoRef = useRef(null);
@@ -42,7 +42,7 @@ export default function CameraView() {
       try {
         const result = await api.scan(blob);
         if (result.success) {
-          .set(result);
+          scanResult.set(result);
           window.location.href = '/dashboard/result';
         } else {
           alert('Gagal memproses gambar');
